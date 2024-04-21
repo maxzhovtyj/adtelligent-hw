@@ -1,4 +1,4 @@
-module adtelligent-internship
+module github.com/maxzhovtyj/adtelligent-hw
 
 go 1.22
 

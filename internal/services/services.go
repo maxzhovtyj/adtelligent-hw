@@ -1,8 +1,8 @@
 package services
 
 import (
-	"adtelligent-internship/internal/models"
-	"adtelligent-internship/internal/storage"
+	"github.com/maxzhovtyj/adtelligent-hw/internal/models"
+	"github.com/maxzhovtyj/adtelligent-hw/internal/storage"
 	"log"
 	"math/rand/v2"
 )

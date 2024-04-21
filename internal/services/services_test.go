@@ -1,9 +1,9 @@
 package services
 
 import (
-	"adtelligent-internship/internal/storage"
-	"adtelligent-internship/pkg/db/postgres"
 	"fmt"
+	"github.com/maxzhovtyj/adtelligent-hw/internal/storage"
+	"github.com/maxzhovtyj/adtelligent-hw/pkg/db/postgres"
 	"testing"
 )
 

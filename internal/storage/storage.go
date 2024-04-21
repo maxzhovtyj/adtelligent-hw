@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"adtelligent-internship/internal/models"
 	"context"
 	"database/sql"
+	"github.com/maxzhovtyj/adtelligent-hw/internal/models"
 	"time"
 )
 
