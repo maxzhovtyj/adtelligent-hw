@@ -5,7 +5,6 @@ import (
 	"github.com/maxzhovtyj/adtelligent-hw/internal/services"
 	"github.com/maxzhovtyj/adtelligent-hw/internal/storage"
 	"github.com/maxzhovtyj/adtelligent-hw/pkg/db/postgres"
-	"math/rand/v2"
 	"testing"
 )
 
@@ -29,7 +28,7 @@ func BenchmarkHandler_sourceCampaigns(b *testing.B) {
 		req := acquire()
 		defer release(req)
 
-		req.ID = rand.N(1000)
+		req.ID = 500
 
 		campaigns, err := testHandler.sourceCampaigns(req)
 		if err != nil {

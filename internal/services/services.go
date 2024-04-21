@@ -26,12 +26,32 @@ func New(storage storage.Storage) Services {
 		storage: storage,
 	}
 
-	go s.initCache()
+	start := make(chan bool)
+
+	go s.initCache(start)
+
+	res := <-start
+
+	log.Println("cache initialized")
+
+	if !res {
+		panic("can't init cache")
+	}
 
 	return s
 }
 
-func (s *services) initCache() {
+func (s *services) initCache(startSig chan<- bool) {
+	all, err := s.storage.GetAllSourceCampaigns()
+	if err != nil {
+		log.Printf("failed to refresh sources campaigns: %v\n", err)
+		startSig <- false
+	}
+
+	s.cache.Refresh(all)
+
+	startSig <- true
+
 	for {
 		start := time.Now()
 
@@ -53,10 +73,10 @@ func (s *services) GetSourceCampaigns(sourceIds ...int) ([]models.Campaign, erro
 		return nil, nil
 	}
 
-	return s.storage.GetSourceCampaigns(sourceIds[0])
+	//return s.storage.GetSourceCampaigns(sourceIds[0])
 
 	// use caching, main tuning
-	//return s.cache.Get(sourceIds[0]), nil
+	return s.cache.Get(sourceIds[0]), nil
 }
 
 const (
