@@ -1,4 +1,4 @@
-GET http://localhost:9999/sources
+GET http://localhost:9999/sources/500/campaigns
 Accept: application/json
 
 ###

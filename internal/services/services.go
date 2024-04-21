@@ -5,6 +5,7 @@ import (
 	"github.com/maxzhovtyj/adtelligent-hw/internal/storage"
 	"log"
 	"math/rand/v2"
+	"time"
 )
 
 type Services interface {
@@ -12,16 +13,50 @@ type Services interface {
 	MostDemandedSources(limit int) ([]storage.DemandedSource, error)
 	GetUnlinkedCampaigns() ([]models.Campaign, error)
 	GetEntitiesNames() ([]string, error)
+	GetSourceCampaigns(sourceId ...int) ([]models.Campaign, error)
 }
 
 type services struct {
 	storage storage.Storage
+	cache   CampaignsToSourceCache
 }
 
 func New(storage storage.Storage) Services {
-	return &services{
+	s := &services{
 		storage: storage,
 	}
+
+	go s.initCache()
+
+	return s
+}
+
+func (s *services) initCache() {
+	for {
+		start := time.Now()
+
+		all, err := s.storage.GetAllSourceCampaigns()
+		if err != nil {
+			log.Printf("failed to refresh sources campaigns: %v\n", err)
+			time.Sleep(5 * time.Minute)
+			continue
+		}
+
+		s.cache.Refresh(all)
+		log.Printf("refreshed %d sources campaigns in %s\n", len(all), time.Since(start))
+		time.Sleep(1 * time.Minute)
+	}
+}
+
+func (s *services) GetSourceCampaigns(sourceIds ...int) ([]models.Campaign, error) {
+	if len(sourceIds) == 0 {
+		return nil, nil
+	}
+
+	return s.storage.GetSourceCampaigns(sourceIds[0])
+
+	// use caching, main tuning
+	//return s.cache.Get(sourceIds[0]), nil
 }
 
 const (

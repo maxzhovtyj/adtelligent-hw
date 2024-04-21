@@ -1,6 +1,7 @@
 package models
 
 type Source struct {
-	ID   int
-	Name string
+	ID        int        `json:"ID"`
+	Name      string     `json:"name"`
+	Campaigns []Campaign `json:"campaigns,omitempty"`
 }

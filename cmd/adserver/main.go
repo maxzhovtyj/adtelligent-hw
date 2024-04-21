@@ -1,20 +1,9 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"github.com/maxzhovtyj/adtelligent-hw/internal/app"
 )
 
 func main() {
-	mux := http.NewServeMux()
-
-	//mux.HandleFunc("GET /sources/{id}/campaigns", sourceCampaignsHandler)
-
-	if err := http.ListenAndServe(":9999", mux); err != nil {
-		log.Fatal(err)
-	}
+	app.Run()
 }
-
-//func sourceCampaignsHandler(w http.ResponseWriter, r *http.Request) {
-//	r.PathValue("id")
-//}

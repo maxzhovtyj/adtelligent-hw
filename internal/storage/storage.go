@@ -14,10 +14,19 @@ type Storage interface {
 	GetUnlinkedCampaigns() ([]models.Campaign, error)
 	GetEntitiesNames() ([]string, error)
 	GetMostDemandedSources(limit int) ([]DemandedSource, error)
+
+	GetSourceCampaigns(sourceID int) ([]models.Campaign, error)
+	GetAllSourceCampaigns() (map[int][]models.Campaign, error)
 }
 
 type storage struct {
 	db *sql.DB
+}
+
+func New(db *sql.DB) Storage {
+	return &storage{
+		db: db,
+	}
 }
 
 const selectEntitiesNamesQuery = `
@@ -48,10 +57,4 @@ func (s *storage) GetEntitiesNames() ([]string, error) {
 	}
 
 	return all, nil
-}
-
-func New(db *sql.DB) Storage {
-	return &storage{
-		db: db,
-	}
 }

@@ -74,3 +74,70 @@ func (s *storage) GetMostDemandedSources(limit int) ([]DemandedSource, error) {
 
 	return mostDemanded, nil
 }
+
+const selectSourceCampaigns = `
+SELECT c.id, c.name 
+FROM sources s
+INNER JOIN campaigns_sources cs ON cs.source_id = s.id
+INNER JOIN campaigns c ON cs.campaign_id = c.id
+WHERE s.id = $1
+`
+
+func (s *storage) GetSourceCampaigns(sourceID int) ([]models.Campaign, error) {
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+
+	rows, err := s.db.QueryContext(ctx, selectSourceCampaigns, sourceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var campaigns []models.Campaign
+
+	for rows.Next() {
+		var cmp models.Campaign
+
+		if err = rows.Scan(&cmp.ID, &cmp.Name); err != nil {
+			return nil, err
+		}
+
+		campaigns = append(campaigns, cmp)
+	}
+
+	return campaigns, nil
+}
+
+const selectAllSourceCampaigns = `
+SELECT s.id, c.id, c.name 
+FROM sources s
+INNER JOIN campaigns_sources cs ON cs.source_id = s.id
+INNER JOIN campaigns c ON cs.campaign_id = c.id
+`
+
+func (s *storage) GetAllSourceCampaigns() (map[int][]models.Campaign, error) {
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+
+	rows, err := s.db.QueryContext(ctx, selectAllSourceCampaigns)
+	if err != nil {
+		return nil, err
+	}
+
+	all := make(map[int][]models.Campaign)
+
+	for rows.Next() {
+		var sourceID, campaignID int
+		var campaignName string
+
+		if err = rows.Scan(&sourceID, &campaignID, &campaignName); err != nil {
+			return nil, err
+		}
+
+		all[sourceID] = append(all[sourceID], models.Campaign{
+			ID:   campaignID,
+			Name: campaignName,
+		})
+	}
+
+	return all, nil
+}
