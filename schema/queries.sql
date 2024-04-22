@@ -48,4 +48,11 @@ SELECT s.id as source_id, c.id AS campaign_id, c.name AS campaign_name
 FROM sources s
          INNER JOIN campaigns_sources cs ON cs.source_id = s.id
          INNER JOIN campaigns c ON cs.campaign_id = c.id
-WHERE s.id = 500
+WHERE s.id = 500;
+
+SELECT concat('http://localhost:9999/sources/', s.id, '/campaigns')
+FROM sources s
+         INNER JOIN campaigns_sources cs ON cs.source_id = s.id
+         INNER JOIN campaigns c ON cs.campaign_id = c.id
+GROUP BY s.id
+LIMIT 100
