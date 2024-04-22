@@ -1,4 +1,4 @@
-GET http://localhost:9999/sources/500/campaigns
+GET http://localhost:9999/sources/500/campaigns?domains=google.com
 Accept: application/json
 
 ###

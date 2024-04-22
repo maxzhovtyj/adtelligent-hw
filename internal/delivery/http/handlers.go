@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Handler struct {
@@ -34,6 +35,10 @@ func (h *Handler) sourceCampaignsHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		h.responseError(w, http.StatusBadRequest, "invalid source id")
 		return
+	}
+
+	for _, d := range strings.Split(r.URL.Query().Get("domains"), ",") {
+		req.Domains = append(req.Domains, d)
 	}
 
 	campaigns, err := h.services.GetSourceCampaigns(req)

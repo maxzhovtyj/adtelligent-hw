@@ -44,7 +44,7 @@ FROM campaigns c
          LEFT JOIN campaigns_sources cs ON c.id = cs.campaign_id
 WHERE cs.id IS NULL;
 
-SELECT s.id as source_id, c.id AS campaign_id, c.name AS campaign_name
+SELECT s.id as source_id, c.id AS campaign_id, c.name AS campaign_name, c.domains_whitelist
 FROM sources s
          INNER JOIN campaigns_sources cs ON cs.source_id = s.id
          INNER JOIN campaigns c ON cs.campaign_id = c.id
@@ -55,4 +55,6 @@ FROM sources s
          INNER JOIN campaigns_sources cs ON cs.source_id = s.id
          INNER JOIN campaigns c ON cs.campaign_id = c.id
 GROUP BY s.id
-LIMIT 100
+LIMIT 100;
+
+UPDATE campaigns SET domains_whitelist = array_append(domains_whitelist, 'google.com')

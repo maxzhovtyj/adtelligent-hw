@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS campaigns_sources
     source_id   INTEGER REFERENCES sources (id) ON DELETE CASCADE   NOT NULL
 );
 
+ALTER TABLE campaigns ADD COLUMN domains_whitelist VARCHAR[];
+
 SELECT * FROM campaigns_sources;
 SELECT * FROM campaigns;
 SELECT * FROM sources;

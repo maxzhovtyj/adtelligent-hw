@@ -56,7 +56,7 @@ func (s *services) initCache(startSig chan<- bool) {
 	for {
 		start := time.Now()
 
-		all, err := s.storage.GetAllSourceCampaigns()
+		all, err = s.storage.GetAllSourceCampaigns()
 		if err != nil {
 			log.Printf("failed to refresh sources campaigns: %v\n", err)
 			time.Sleep(5 * time.Minute)
@@ -86,18 +86,36 @@ func Release(r *GetSourceCampaignsRequest) {
 }
 
 type GetSourceCampaignsRequest struct {
-	ID int
+	ID      int
+	Domains []string
 }
 
 func (r *GetSourceCampaignsRequest) Reset() {
 	r.ID = 0
+	r.Domains = r.Domains[:0]
 }
 
 func (s *services) GetSourceCampaigns(req *GetSourceCampaignsRequest) ([]models.Campaign, error) {
-	//return s.storage.GetSourceCampaigns(req.ID)
+	//campaigns, err := s.storage.GetSourceCampaigns(req.ID)
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	// use caching, main tuning
-	return s.cache.Get(req.ID), nil
+	//use caching, main tuning
+	campaigns := s.cache.Get(req.ID)
+
+	var filteredCampaigns []models.Campaign
+
+	for _, c := range campaigns {
+		for _, d := range req.Domains {
+			if c.DomainWhitelist.Has(d) {
+				filteredCampaigns = append(filteredCampaigns, c)
+				break
+			}
+		}
+	}
+
+	return filteredCampaigns, nil
 }
 
 const (
