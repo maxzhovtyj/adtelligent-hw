@@ -5,6 +5,7 @@ import (
 	"github.com/maxzhovtyj/adtelligent-hw/internal/storage"
 	"log"
 	"math/rand/v2"
+	"sync"
 	"time"
 )
 
@@ -13,7 +14,7 @@ type Services interface {
 	MostDemandedSources(limit int) ([]storage.DemandedSource, error)
 	GetUnlinkedCampaigns() ([]models.Campaign, error)
 	GetEntitiesNames() ([]string, error)
-	GetSourceCampaigns(sourceId ...int) ([]models.Campaign, error)
+	GetSourceCampaigns(req *GetSourceCampaignsRequest) ([]models.Campaign, error)
 }
 
 type services struct {
@@ -68,15 +69,35 @@ func (s *services) initCache(startSig chan<- bool) {
 	}
 }
 
-func (s *services) GetSourceCampaigns(sourceIds ...int) ([]models.Campaign, error) {
-	if len(sourceIds) == 0 {
-		return nil, nil
+var p sync.Pool
+
+func Acquire() *GetSourceCampaignsRequest {
+	r := p.Get()
+	if r == nil {
+		return new(GetSourceCampaignsRequest)
 	}
 
-	//return s.storage.GetSourceCampaigns(sourceIds[0])
+	return r.(*GetSourceCampaignsRequest)
+}
+
+func Release(r *GetSourceCampaignsRequest) {
+	r.Reset()
+	p.Put(r)
+}
+
+type GetSourceCampaignsRequest struct {
+	ID int
+}
+
+func (r *GetSourceCampaignsRequest) Reset() {
+	r.ID = 0
+}
+
+func (s *services) GetSourceCampaigns(req *GetSourceCampaignsRequest) ([]models.Campaign, error) {
+	//return s.storage.GetSourceCampaigns(req.ID)
 
 	// use caching, main tuning
-	return s.cache.Get(sourceIds[0]), nil
+	return s.cache.Get(req.ID), nil
 }
 
 const (

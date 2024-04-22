@@ -57,3 +57,19 @@ func TestServices_MostDemandedSources(t *testing.T) {
 		fmt.Println(src.ID, src.Count)
 	}
 }
+
+func BenchmarkHandler_sourceCampaigns(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		req := Acquire()
+		defer Release(req)
+
+		req.ID = 500
+
+		campaigns, err := testServices.GetSourceCampaigns(req)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		_ = campaigns
+	}
+}

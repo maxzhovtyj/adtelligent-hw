@@ -2,12 +2,10 @@ package delivery
 
 import (
 	"encoding/json"
-	"github.com/maxzhovtyj/adtelligent-hw/internal/models"
 	"github.com/maxzhovtyj/adtelligent-hw/internal/services"
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 )
 
 type Handler struct {
@@ -27,8 +25,8 @@ func (h *Handler) Init() *http.ServeMux {
 }
 
 func (h *Handler) sourceCampaignsHandler(w http.ResponseWriter, r *http.Request) {
-	req := acquire()
-	defer release(req)
+	req := services.Acquire()
+	defer services.Release(req)
 
 	var err error
 
@@ -38,46 +36,13 @@ func (h *Handler) sourceCampaignsHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	campaigns, err := h.sourceCampaigns(req)
+	campaigns, err := h.services.GetSourceCampaigns(req)
 	if err != nil {
 		h.responseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	h.responseJSON(w, campaigns)
-}
-
-var p sync.Pool
-
-func acquire() *Request {
-	r := p.Get()
-	if r == nil {
-		return new(Request)
-	}
-
-	return r.(*Request)
-}
-
-func release(r *Request) {
-	r.Reset()
-	p.Put(r)
-}
-
-type Request struct {
-	ID int
-}
-
-func (r *Request) Reset() {
-	r.ID = 0
-}
-
-func (h *Handler) sourceCampaigns(req *Request) ([]models.Campaign, error) {
-	campaigns, err := h.services.GetSourceCampaigns(req.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return campaigns, nil
 }
 
 func (h *Handler) responseJSON(w http.ResponseWriter, data any) {
