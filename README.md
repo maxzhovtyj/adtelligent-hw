@@ -1,3 +1,10 @@
+### Source campaigns endpoint performance testing
+
+[Results](./vegeta/README.md)
+
+#### Conclusion: 
+database connection is a bottleneck, data caching in memory significantly improves performance  
+
 ### 1. Основы проектирования баз данных, Шардирование и реплецирование
 
 - Типа джоинов
