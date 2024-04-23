@@ -107,12 +107,20 @@ func (s *services) GetSourceCampaigns(req *GetSourceCampaignsRequest) ([]models.
 	var filteredCampaigns []models.Campaign
 
 	for _, c := range campaigns {
+		hasAll := true
+
 		for _, d := range req.Domains {
-			if c.DomainWhitelist.Has(d) {
-				filteredCampaigns = append(filteredCampaigns, c)
+			if !c.DomainWhitelist.Has(d) {
+				hasAll = false
 				break
 			}
 		}
+
+		if !hasAll {
+			continue
+		}
+
+		filteredCampaigns = append(filteredCampaigns, c)
 	}
 
 	return filteredCampaigns, nil
