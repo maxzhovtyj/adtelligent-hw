@@ -59,12 +59,11 @@ func TestServices_MostDemandedSources(t *testing.T) {
 }
 
 func BenchmarkHandler_sourceCampaigns(b *testing.B) {
+	req := Acquire()
+	defer Release(req)
+	req.ID = 500
+
 	for i := 0; i < b.N; i++ {
-		req := Acquire()
-		defer Release(req)
-
-		req.ID = 500
-
 		campaigns, err := testServices.GetSourceCampaigns(req)
 		if err != nil {
 			fmt.Println(err)
